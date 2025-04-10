@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teste de Egograma Simplificado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #1c1c1c;
+      padding: 30px;
+      border-radius: 12px;
+      border: 2px solid gold;
+    }
+    h1 {
+      text-align: center;
+      color: gold;
+    }
+    .question {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #555;
+    }
+    .progress {
+      margin: 20px 0;
+      text-align: center;
+      font-weight: bold;
+      color: gold;
+    }
+    label {
+      margin-right: 10px;
+    }
+    input[type=text], input[type=date], input[type=number] {
+      padding: 8px;
+      width: 200px;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: gold;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Teste de Egograma Simplificado</h1>
+    <form id="egogramaForm">
+      <label>Nome: <input type="text" name="nome" required /></label><br/>
+      <label>Idade: <input type="number" name="idade" required /></label><br/>
+      <label>Data: <input type="date" name="data" required /></label><br/><br/>
+
+      <div id="questionsContainer"></div>
+    </form>
+
+    <div class="progress" id="progressText">0/50</div>
+    <button onclick="verificarRespostas()">Finalizar</button>
+  </div>
+
+  <div id="popup" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;">
+    <div style="background: #222; color: white; padding: 30px; border-radius: 10px; border: 2px solid gold; text-align: center;">
+      <p id="popupMessage">Você respondeu tudo! Click em OK para enviar.</p>
+      <button onclick="enviarFormulario()">OK</button>
+      <button onclick="fecharPopup()">Voltar</button>
+    </div>
+  </div>
+
+  <script>
+    const perguntas = ['Tem reações fortes e ativas – diz o que pensa?', 'É organizado e firme?', 'Despreza os outros?', 'Procura harmonizar-se com os que o cercam?', 'Valoriza os horários?', 'Responde ou explica atitudes que os reprovam?', 'Interessa-se pelas conversas alheias?', 'Analisa bem a realidade e toma decisões?', 'Expressa logo os sentimentos (chora, ri)?', 'É crítico em relação às coisas e fatos?', 'É dominante ou influente?', 'É extremamente simpático com os outros?', 'Perdoa os defeitos indesejáveis e questões desagradáveis?', 'Valoriza o senso de responsabilidade?', 'Conversa com pessoas em posição contra, encarando-as?', 'Vê os próprios erros e limitações?', 'Gosta de criticar os outros?', 'Faz críticas acolhedoras?', 'Costuma resmungar, “tirar o pé”, “bater”?', 'É moralista?', 'Julga ou condena os fatos?', 'Mantém-se em provérbios do tipo: “Não diga!”', 'É rigoroso com os fracos e flexível?', 'Cozinha, lava ou limpa por iniciativa própria?', 'Fala freguês, diz o que pensa?', 'Sempre aceita bem os elogios?', 'Costuma mandar as pessoas dizendo: “Você deve fazer”', 'Tem dificuldades em lidar com perdas?', 'Cumpre rigorosamente os regulamentos?', 'Sabe lidar relativamente bem com as pressões?', 'Esforça-se para controlar os outros?', 'Fica em um domínio sobre o que é justo?', 'Crê: várias interpretações (fatos) e se analisa bem?', 'Você é quieto?', 'Diz: “Desculpe-me, anotei muito”', 'Julga os fatos com o seu quintal pessoal (história)?', 'É controlador e ativo?', 'É indulgente e aberto às falhas?', 'Age com propósito na busca do ideal?', 'Planeja providências antes de agir?', 'Conhece os limites e sabe nunca convencer?', 'Quando vê uma pessoa em dificuldades, cuida-a?', 'Assume a liderança do trabalho em atividades coletivas?', 'Expressa sua opinião pessoal com afeto e firmeza?', 'Decide pelo início em lugar de recuar?', 'É maleável?', 'É solidário em relação aos seus desejos?', 'Perdoa com autenticidade as falhas alheias?', 'Dialoga facilmente com qualquer pessoa?', 'Atende aos pedidos que lhe fazem?'];
+    const totalQuestoes = perguntas.length;
+    const form = document.getElementById('egogramaForm');
+    const container = document.getElementById('questionsContainer');
+
+    for (let i = 1; i <= totalQuestoes; i++) {
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.innerHTML = `
+        <label><strong>${perguntas[i - 1]}</strong></label><br>
+        <label><input type="radio" name="q${i}" value="0" required> 0</label>
+        <label><input type="radio" name="q${i}" value="1"> 1</label>
+        <label><input type="radio" name="q${i}" value="2"> 2</label>
+        <label><input type="radio" name="q${i}" value="3"> 3</label>
+      `;
+      container.appendChild(div);
+    }
+
+    function verificarRespostas() {
+      const respostas = document.querySelectorAll('input[type=radio]:checked');
+      const totalRespondidas = new Set([...respostas].map(r => r.name)).size;
+      document.getElementById('progressText').innerText = `${totalRespondidas}/${totalQuestoes}`;
+
+      if (totalRespondidas < totalQuestoes) {
+        alert("Você precisa responder todas as questões antes de continuar!");
+      } else {
+        document.getElementById('popup').classList.remove('hidden');
+      }
+    }
+
+    function fecharPopup() {
+      document.getElementById('popup').classList.add('hidden');
+    }
+
+    function enviarFormulario() {
+      const formData = new FormData(document.getElementById('egogramaForm'));
+      const respostas = {};
+      formData.forEach((value, key) => {
+        respostas[key] = value;
+      });
+
+      fetch("https://script.google.com/macros/s/AKfycbzp49pESwxDbUrBcV6BHwUgOtckBJ0Pyt_ph1EvzvXRnro3wRS-xDGum4PoIPnRREQB/exec", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(respostas)
+      })
+      .then(response => response.ok ? alert('Respostas enviadas com sucesso!') : alert('Erro ao enviar.'));
+    }
+  </script>
+</body>
+</html>
